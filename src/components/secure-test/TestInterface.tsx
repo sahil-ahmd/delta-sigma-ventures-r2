@@ -7,25 +7,68 @@ import { Button } from "../ui/Button";
 export const TestInterface: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [responses, setResponses] = useState<UserResponse[]>([]);
+  const [essayText, setEssayText] = useState(""); // Managed state for textareas
+  const [isFinished, setIsFinished] = useState(false); // Confirmation state
+
   const currentQuestion = mockQuestions[currentIndex];
 
   const handleAnswer = (answer: string) => {
-    // Log that the user interacted with a question
     logService.capture("QUESTION_SUBMITTED", {
       questionId: currentQuestion.id,
       type: currentQuestion.type,
     });
 
-    setResponses([...responses, { questionId: currentQuestion.id, answer }]);
+    const updatedResponses = [
+      ...responses,
+      { questionId: currentQuestion.id, answer },
+    ];
+    setResponses(updatedResponses);
+    setEssayText(""); // Reset for next potential essay
 
     if (currentIndex < mockQuestions.length - 1) {
       setCurrentIndex((v) => v + 1);
     } else {
-      logService.capture("ASSESSMENT_SUBMITTED");
-      alert("Assessment complete! Audit logs saved.");
+      // Trigger the confirmation view
+      setIsFinished(true);
     }
   };
 
+  const submitAssessment = () => {
+    logService.capture("ASSESSMENT_SUBMITTED");
+    alert("Assessment complete! Audit logs saved.");
+    // window.location.href = "/completion-page";
+  };
+
+  // --- 1. Confirmation View ---
+  if (isFinished) {
+    return (
+      <div className="question-card confirmation-view">
+        <div className="icon-circle success">✓</div>
+        <h2>All Questions Answered</h2>
+        <p>
+          Your responses have been recorded. Please confirm to finalize your
+          submission.
+        </p>
+
+        <div className="confirmation-actions">
+          <Button variant="primary" size="lg" onClick={submitAssessment}>
+            Finalize & Submit
+          </Button>
+          <Button
+            variant="option"
+            onClick={() => {
+              setIsFinished(false);
+              setCurrentIndex(mockQuestions.length - 1); // Go back to last question
+            }}
+          >
+            Review Last Question
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // --- 2. Active Test View ---
   return (
     <div className="test-interface">
       <div className="progress-bar">
@@ -38,38 +81,43 @@ export const TestInterface: React.FC = () => {
         {currentQuestion.type === "multiple-choice" ? (
           <div className="options-grid">
             {currentQuestion.options?.map((opt, index) => (
-              <Button 
-              key={index} 
-              variant="option" 
-              onClick={() => handleAnswer(opt)}
-            >
-              <span className="option-indicator">{String.fromCharCode(65 + index)}</span>
-              {opt}
-            </Button>
+              <Button
+                key={index}
+                variant="option"
+                onClick={() => handleAnswer(opt)}
+              >
+                <span className="option-indicator">
+                  {String.fromCharCode(65 + index)}
+                </span>
+                {opt}
+              </Button>
             ))}
           </div>
         ) : (
           <div className="text-response">
             <textarea
-              id="essay-answer"
+              value={essayText}
+              onChange={(e) => setEssayText(e.target.value)}
               placeholder="Type your response here..."
-              onBlur={(e) =>
+              style={{
+                width: "100%",
+                height: "250px",
+                padding: "15px",
+                borderRadius: "8px",
+              }}
+              onBlur={() =>
                 logService.capture("TAB_SWITCH_DETECTED", {
                   context: "textarea-blur",
                 })
               }
             />
-            <button
-              className="btn-primary"
-              onClick={() => {
-                const val = (
-                  document.getElementById("essay-answer") as HTMLTextAreaElement
-                ).value;
-                handleAnswer(val);
-              }}
+            <Button
+              variant="primary"
+              onClick={() => handleAnswer(essayText)}
+              disabled={!essayText.trim()}
             >
-              Submit Answer
-            </button>
+              Next Question
+            </Button>
           </div>
         )}
       </div>

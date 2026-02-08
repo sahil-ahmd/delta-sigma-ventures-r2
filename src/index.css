@@ -145,4 +145,54 @@
     color: white;
     border-color: var(--primary-color);
   }
+
+  .confirmation-view {
+    text-align: center;
+    padding: 3rem;
+    border: 2px solid var(--primary-color); /* Highlight the final step */
+  }
   
+  .confirmation-view h2 {
+    font-size: 1.8rem;
+    color: var(--text-main);
+    margin-bottom: 1rem;
+  }
+  
+  .confirmation-view p {
+    color: #64748b;
+    margin-bottom: 2rem;
+  }
+  
+  .confirmation-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  
+  /* Specific styling for the question text */
+  .question-text {
+    margin-bottom: 2rem;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: var(--text-main);
+  }
+
+  /* Update your existing .text-response textarea or add this */
+.text-response textarea {
+    width: 100%;           /* Fills the container width */
+    max-width: 800px;      /* Prevents it from getting too wide on huge monitors */
+    height: 250px;         /* Specific fixed height */
+    min-height: 150px;     /* Prevents it from being collapsed too small */
+    
+    padding: 1.25rem;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 16px;       /* Prevents iOS zoom on focus */
+    line-height: 1.6;
+    
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background-color: #ffffff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    resize: vertical;      /* Allows user to make it taller, but not wider */
+  }
