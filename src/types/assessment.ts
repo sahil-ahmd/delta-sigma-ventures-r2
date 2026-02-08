@@ -1,3 +1,5 @@
+// Define the "Unified Event Schema" strictly.
+
 export type EventType = 
   | 'FULLSCREEN_REQUESTED' | 'FULLSCREEN_ENTERED' 
   | 'FULLSCREEN_EXITED' | 'TAB_SWITCH_DETECTED' 
