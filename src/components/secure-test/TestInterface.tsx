@@ -4,7 +4,11 @@ import { logService } from "../../services/logService";
 import type { UserResponse } from "../../types/assessment";
 import { Button } from "../ui/Button";
 
-export const TestInterface: React.FC = () => {
+interface TestInterfaceProps {
+  onComplete: () => void;
+}
+
+export const TestInterface: React.FC<TestInterfaceProps> = ({ onComplete }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [responses, setResponses] = useState<UserResponse[]>([]);
   const [essayText, setEssayText] = useState(""); // Managed state for textareas
@@ -35,8 +39,9 @@ export const TestInterface: React.FC = () => {
 
   const submitAssessment = () => {
     logService.capture("ASSESSMENT_SUBMITTED");
-    alert("Assessment complete! Audit logs saved.");
-    // window.location.href = "/completion-page";
+    //alert("Assessment complete! Audit logs saved.");
+    onComplete();
+    setIsFinished(true);
   };
 
   // --- 1. Confirmation View ---
