@@ -2,28 +2,93 @@ import React, { useState } from "react";
 import { useSecureEnvironment } from "./hooks/useSecureEnvironment";
 import { TestInterface } from "./components/secure-test/TestInterface";
 import { ViolationModal } from "./components/secure-test/ViolationModal";
-import { ProctorCamera } from "./components/secure-test/ProctorCamera"; // Optional but recommended
+import { ProctorCamera } from "./components/secure-test/ProctorCamera";
+import { Button } from "./components/ui/Button";
 
 export const App: React.FC = () => {
   const TOLERANCE = 3;
-  const { isFullscreen, violations, enterFullscreen, isExceeded } =
-    useSecureEnvironment(TOLERANCE);
+  const [isStarted, setIsStarted] = useState(false);
   const [hasFinished, setHasFinished] = useState<boolean>(false);
+  
+  const { isFullscreen, violations, enterFullscreen, isExceeded } = useSecureEnvironment(TOLERANCE);
 
-  // 1. Final Termination State
+  const handleStartTest = () => {
+    setIsStarted(true);
+    enterFullscreen(); // Forces fullscreen as soon as they click start
+  };
+
+  // Final Termination State (If they cheat too much)
   if (isExceeded) {
     return (
-      <div className="terminated flex h-screen items-center justify-center">
-        <h1 className="text-red-600 text-3xl font-bold">Assessment Revoked</h1>
-        <p>Protocol breach: Maximum exits reached.</p>
+      <div className="error-page-container">
+        <div className="error-card">
+          <h1>Assessment Revoked</h1>
+          
+          <p>
+            Your test session has been terminated due to multiple security violations 
+            detected in your environment.
+          </p>
+  
+          <div className="error-details">
+            <div><strong>Reason:</strong> Maximum exit tolerance exceeded</div>
+            <div><strong>Timestamp:</strong> {new Date().toLocaleTimeString()}</div>
+            <div><strong>Status:</strong> Logged & Reported</div>
+          </div>
+  
+          <button 
+            style={{
+              marginTop: '24px',
+              background: 'none',
+              border: 'none',
+              color: '#3b82f6',
+              cursor: 'pointer',
+              fontSize: '14px',
+              textDecoration: 'underline'
+            }}
+            onClick={() => window.location.reload()}
+          >
+            Contact Support
+          </button>
+        </div>
       </div>
     );
   }
 
+  // Home Page / Instructions View
+  if (!isStarted) {
+    return (
+      <div className="home-page-container">
+        <div className="instruction-card">
+          <h1>Final Examination</h1>
+          
+          <div className="instruction-list">
+            <p>Important Instructions:</p>
+            <ul>
+              <li>This is a secure, proctored environment.</li>
+              <li>Switching tabs or exiting fullscreen triggers a <strong>violation</strong>.</li>
+              <li>You have <strong>{TOLERANCE} attempts</strong>. Exceeding this will lock the test.</li>
+              <li>Ensure your webcam is centered and your room is well-lit.</li>
+            </ul>
+          </div>
+  
+          <button className="start-btn" onClick={handleStartTest}>
+            Start Secure Assessment
+          </button>
+          
+          <p style={{ marginTop: '20px', fontSize: '12px', color: '#94a3b8', textAlign: 'center' }}>
+            By starting, you agree to the automated proctoring terms.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Active Test Environment
   return (
     <div className="relative min-h-screen bg-slate-50">
-      {/* 2. Security Modal: The ONLY thing shown when not in fullscreen */}
-      {!isFullscreen && !hasFinished && (
+      
+      {/* Violation Modal: Only shows if started, not finished, and not in fullscreen */}
+      {!isFullscreen && !hasFinished && isStarted && (
         <ViolationModal
           violations={violations}
           maxViolations={TOLERANCE}
@@ -31,35 +96,29 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* 3. Optional: Live Proctoring View (Only when test is active) */}
-      {isFullscreen && <ProctorCamera />}
+      {/* Security Features */}
+      {isFullscreen && !hasFinished && <ProctorCamera />}
 
-      {/* 4. Assessment Content: Managed by CSS classes for security blurring */}
+      {/* Blur the content if the user is currently violating (not in fullscreen) */}
       <div
         className={`transition-all duration-700 p-8 ${
-          !isFullscreen
-            ? "blur-2xl pointer-events-none scale-95 opacity-0"
-            : "blur-0 scale-100 opacity-100"
+          !isFullscreen && !hasFinished ? "blur-3xl pointer-events-none opacity-0" : "blur-0 opacity-100"
         }`}
       >
         <div className="max-w-4xl mx-auto">
           {/* Status Header */}
-          {/* HIDE STATUS HEADER: Only show if not finished */}
           {!hasFinished && (
             <div className="flex justify-between items-center mb-6 p-4 bg-white shadow-sm rounded-lg border border-slate-200">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-sm font-semibold text-slate-700">
-                  Environment: SECURE
-                </span>
+                <span className="text-sm font-semibold text-slate-700">Environment: SECURE</span>
               </div>
-              <div className="text-xs font-mono text-slate-400">
-                AUDIT_TRAIL_ACTIVE | EXITS: {violations}
+              <div className="text-xs font-mono text-slate-400 italic">
+                EXITS: {violations} / {TOLERANCE}
               </div>
             </div>
           )}
 
-          {/* PASS THE SETTER: Tell the interface how to update the app state */}
           <TestInterface onComplete={() => setHasFinished(true)} />
         </div>
       </div>
