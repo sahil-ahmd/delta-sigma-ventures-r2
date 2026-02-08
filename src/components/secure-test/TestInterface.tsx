@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { mockQuestions } from "../../services/mockData";
 import { logService } from "../../services/logService";
 import type { UserResponse } from "../../types/assessment";
+import { Button } from "../ui/Button";
 
 export const TestInterface: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -36,14 +37,15 @@ export const TestInterface: React.FC = () => {
 
         {currentQuestion.type === "multiple-choice" ? (
           <div className="options-grid">
-            {currentQuestion.options?.map((opt) => (
-              <button
-                key={opt}
-                className="btn-option"
-                onClick={() => handleAnswer(opt)}
-              >
-                {opt}
-              </button>
+            {currentQuestion.options?.map((opt, index) => (
+              <Button 
+              key={index} 
+              variant="option" 
+              onClick={() => handleAnswer(opt)}
+            >
+              <span className="option-indicator">{String.fromCharCode(65 + index)}</span>
+              {opt}
+            </Button>
             ))}
           </div>
         ) : (

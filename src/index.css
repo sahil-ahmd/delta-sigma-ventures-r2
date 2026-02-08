@@ -1,0 +1,148 @@
+/* Variable Definitions for consistency */
+:root {
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --danger-color: #dc2626;
+  --danger-hover: #b91c1c;
+  --option-bg: #ffffff;
+  --option-border: #e2e8f0;
+  --option-hover-bg: #f8fafc;
+  --option-hover-border: #2563eb;
+  --text-main: #1e293b;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Base Button Style */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: inherit;
+  gap: 10px;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* Size Variants */
+.btn-md {
+  padding: 10px 24px;
+  font-size: 14px;
+}
+
+.btn-lg {
+  padding: 16px 32px;
+  font-size: 16px;
+}
+
+/* Color Variants */
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: var(--danger-hover);
+}
+
+/* Multiple Choice Option Style */
+.btn-option {
+  background-color: var(--option-bg);
+  border: 2px solid var(--option-border);
+  color: var(--text-main);
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 18px;
+  margin-bottom: 12px;
+}
+
+.btn-option:hover {
+  border-color: var(--option-hover-border);
+  background-color: var(--option-hover-bg);
+  color: var(--primary-color);
+}
+
+/* The backdrop that covers the whole screen */
+.warning-overlay {
+  position: fixed; /* Fixes it to the viewport */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.95); /* Dark, slightly transparent */
+  backdrop-filter: blur(10px); /* Blurs the background content */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* Higher than everything else */
+  padding: 20px;
+}
+
+/* The actual white box in the center */
+.modal {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  max-width: 450px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: modalPop 0.3s ease-out;
+}
+
+@keyframes modalPop {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Ensure the warning icon isn't massive */
+.modal svg {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1rem;
+}
+
+.option-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    font-size: 12px;
+    color: #64748b;
+    font-weight: bold;
+  }
+  
+  .btn-option:hover .option-indicator {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+  }
+  
