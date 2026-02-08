@@ -13,6 +13,7 @@ export const TestInterface: React.FC<TestInterfaceProps> = ({ onComplete }) => {
   const [responses, setResponses] = useState<UserResponse[]>([]);
   const [essayText, setEssayText] = useState(""); // Managed state for textareas
   const [isFinished, setIsFinished] = useState(false); // Confirmation state
+  const [showFinalModal, setShowFinalModal] = useState(false);
 
   const currentQuestion = mockQuestions[currentIndex];
 
@@ -39,12 +40,33 @@ export const TestInterface: React.FC<TestInterfaceProps> = ({ onComplete }) => {
 
   const submitAssessment = () => {
     logService.capture("ASSESSMENT_SUBMITTED");
-    //alert("Assessment complete! Audit logs saved.");
+    setShowFinalModal(true);
     onComplete();
     setIsFinished(true);
   };
 
-  // --- 1. Confirmation View ---
+  // ---- SUCCESS MODAL ----
+  if (showFinalModal) {
+    return (
+      <div className="modal-overlay">
+        <div className="success-modal">
+          <div className="success-icon">✓</div>
+          <h2 className="text-2xl font-bold mb-2">Test Submitted!</h2>
+          <p className="text-slate-600 mb-6">
+            Your responses and proctoring logs have been securely uploaded.
+          </p>
+          <Button 
+            variant="primary" 
+            onClick={() => window.location.reload()} 
+          >
+            Back to Dashboard
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // --- Confirmation View ---
   if (isFinished) {
     return (
       <div className="question-card confirmation-view">
