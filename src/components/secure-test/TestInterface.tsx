@@ -95,7 +95,7 @@ export const TestInterface: React.FC<TestInterfaceProps> = ({ onComplete }) => {
     );
   }
 
-  // --- 2. Active Test View ---
+  // --- Active Test View ---
   return (
     <div className="test-interface">
       <div className="progress-bar">
