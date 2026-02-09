@@ -26,13 +26,22 @@ export const App: React.FC = () => {
   }, [isStarted, hasFinished, isExceeded]);
 
   const handleStartTest = () => {
-    setIsStarted(true);
-    enterFullscreen(); // Forces fullscreen as soon as they click start
-    // OBJECTIVE: Unified Schema - Session Start
-    logService.capture("ASSESSMENT_STARTED", {
-      device: navigator.platform,
-      startTime: new Date().toISOString(),
+    // Log the intent to start
+    logService.capture("ASSESSMENT_STARTED", { 
+      timestamp: new Date().toISOString() 
     });
+  
+    // Change the UI state first
+    setIsStarted(true);
+  
+    // Trigger Fullscreen
+    // Note: We wrap this in a timeout or check for Test Mode to prevent 
+    // the "browser gesture" error from blocking the UI transition.
+    const isTestMode = new URLSearchParams(window.location.search).get('debug') === 'true';
+    
+    if (!isTestMode) {
+      enterFullscreen();
+    }
   };
 
   const handleComplete = () => {

@@ -11,18 +11,19 @@ export const useSecureEnvironment = (tolerance: number) => {
 
     // Handle Fullscreen Lcgic
     const handleFullscreen = () => {
-      const isFull = !!document.fullscreenElement;
-      setIsFullscreen(isFull);
-
-      if (!isFull) {
-        setViolations((v) => v + 1);
-        logService.capture("FULLSCREEN_EXITED", {
-          currentViolationCount: violations + 1,
-        });
-      } else {
-        logService.capture("FULLSCREEN_ENTERED");
-      }
-    };
+        const isFull = !!document.fullscreenElement;
+        setIsFullscreen(isFull);
+      
+        // ONLY count as a violation if the test has already successfully 
+        // entered fullscreen at least once before.
+        if (!isFull) { // Add an 'isStarted' check here
+          setViolations((v) => {
+            const newCount = v + 1;
+            logService.capture("FULLSCREEN_EXITED", { violationCount: newCount });
+            return newCount;
+          });
+        }
+      };
 
     // Handle Tab/Focus Changes (New)
     const handleVisibility = () => {
@@ -71,7 +72,7 @@ export const useSecureEnvironment = (tolerance: number) => {
   const enterFullscreen = () => {
     const isTestMode = new URLSearchParams(window.location.search).get('debug') === 'true';
     if (isTestMode) return;
-    
+
     document.documentElement.requestFullscreen().catch(() => {
       alert("Permission denied or browser blocked fullscreen.");
     });
