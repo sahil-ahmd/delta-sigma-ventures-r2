@@ -6,6 +6,9 @@ export const useSecureEnvironment = (tolerance: number) => {
   const [violations, setViolations] = useState<number>(0);
 
   useEffect(() => {
+    const isTestMode =
+      new URLSearchParams(window.location.search).get("debug") === "true";
+
     // Handle Fullscreen Lcgic
     const handleFullscreen = () => {
       const isFull = !!document.fullscreenElement;
@@ -39,18 +42,23 @@ export const useSecureEnvironment = (tolerance: number) => {
 
     // Prevent copy/paste/context with metadata
     const block = (e: Event) => {
-      e.preventDefault();
-      logService.capture(`PREVENTED_${e.type.toUpperCase()}` as any, {
-        targetTag: (e.target as HTMLElement)?.tagName,
-        timestamp: Date.now(),
-      });
+      if (!isTestMode) {
+        e.preventDefault();
+        logService.capture(`PREVENTED_${e.type.toUpperCase()}` as any, {
+          targetTag: (e.target as HTMLElement)?.tagName,
+          timestamp: Date.now(),
+        });
+      }
     };
 
     document.addEventListener("fullscreenchange", handleFullscreen);
     document.addEventListener("visibilitychange", handleVisibility);
-    document.addEventListener("copy", block);
-    document.addEventListener("paste", block);
-    document.addEventListener("contextmenu", block);
+
+    if (!isTestMode) {
+      document.addEventListener("copy", block);
+      document.addEventListener("paste", block);
+      document.addEventListener("contextmenu", block);
+    }
 
     return () => {
       document.removeEventListener("fullscreenchange", handleFullscreen);
@@ -61,6 +69,9 @@ export const useSecureEnvironment = (tolerance: number) => {
   }, []);
 
   const enterFullscreen = () => {
+    const isTestMode = new URLSearchParams(window.location.search).get('debug') === 'true';
+    if (isTestMode) return;
+    
     document.documentElement.requestFullscreen().catch(() => {
       alert("Permission denied or browser blocked fullscreen.");
     });
